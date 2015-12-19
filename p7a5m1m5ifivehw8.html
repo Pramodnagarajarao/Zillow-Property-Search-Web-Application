@@ -1,0 +1,443 @@
+<!-- Code with bootrsap -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Pramod Nagarajarao's Homework8 HTML File</title>
+<style>
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    background: #ffffff;
+}
+/*.nav-tabs {
+    color: #ffffff;
+    margin-bottom: 0;
+    color: #F1AC49; 
+}*/
+/*#submit{
+    margin-top:40px;
+}*/
+#container1 {
+    width: 95%;
+    margin: 60px 0px 0px 30px;
+}
+input.error,select.error { 
+    border: 1px solid #FF0000;
+}
+label.error {
+    color: #FF0000;
+}
+
+.nav-tabs>li>a {
+    background-color:#EEAB58;
+    border: 1px solid #EEAB58;
+    opacity:0.8;
+    color:white;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+                color: #666666;
+                background-color: #ffffff;
+                border: 1px solid orange;
+                opacity:0.9;
+}
+.carousel-indicators li {
+                background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+                border-radius: 50%;
+                box-shadow: 10px 10px 10px 10px rgb(231, 145, 65) inset;
+                cursor: pointer;
+                display: inline-block;
+                height: 10px;
+                opacity: 0.1;
+                text-indent: 0;
+                z-index: 1000;
+                width:10px;
+                border-color: rgb(214,153,79);
+                border-width: 2px;
+            }
+.carousel-indicators .active {
+                background-color: rgb(231, 145, 65);
+                height: 10px;
+                margin: 2px;
+                width:10px;
+                opacity: 1;
+                z-index: 1000;
+             }            
+.carousel-caption
+            {
+                position:absolute;
+                background:#333;
+                right:0;
+                bottom:0;
+                left:0;
+                padding:15px;
+                background:rgba(0,0,0,0.3);
+                margin: 0px -220px -20px -220px;
+            }
+.carousel-caption h4,.carousel-caption h5
+            {
+                line-height:10px;color:#fff
+            }
+.carousel-caption h4{
+                margin:0px 0px 0px 0px;
+            }
+.carousel-caption h5{
+                margin-bottom:0px;
+            }
+
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+    window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '354045141428881',
+                    xfbml      : true,
+                    version    : 'v2.2'
+                });
+            };
+
+            (function(d, s, id){
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) {return;}
+                    js = d.createElement(s); js.id = id;
+                    js.src = "//connect.facebook.net/en_US/sdk.js";
+                    fjs.parentNode.insertBefore(js, fjs);
+                    }(document, 'script', 'facebook-jssdk'));
+
+            var name;
+            var description;
+            var link;
+            var picture;
+
+            function facebook_button()
+            {
+
+                FB.ui({
+                    method: 'feed',
+                    link: link,
+                    picture: picture,
+                    caption: 'Property Information from Zillow.com',
+                    description: description,
+                    name: name,
+                }, function(response) {
+
+                    if (response) {
+                        if (!response.error_code) {
+                            alert("Posted Successfully");
+                        }
+                        else
+                        {
+                            alert("Unable to post");
+                        }
+                    }
+                });
+            }
+
+
+$(document).ready(function(){
+
+    $("#state").prop("selectedIndex",-1);
+    $("form").validate({
+        rules: {
+            address:{
+                required: true
+            },
+            city:{
+                required: true
+            },
+            state:{
+                required: true
+            }
+
+        },
+
+        errorElement:"span",errorClass:"help-block",
+        errorPlacement: function (error, element)
+        {
+            error.insertAfter(element);
+        },
+        highlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+        },
+        unhighlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+        },    
+        submitHandler: function() {
+           var address = $("#address").val();
+           var city = $("#city").val();
+           var e = document.getElementById("state"); 
+           var state = e.options[e.selectedIndex].text;
+           console.log("Outside ajax street_address:"+address+"city_address:"+city+"state_address:"+state);
+                $.ajax({
+                type: "GET",
+                url: "http://webtechhw-env.elasticbeanstalk.com/index.php",
+                data: {street_address:address,city_address:city,state_address:state},
+                dataType: 'json',
+                success: function(response){
+                var object = response;
+                // if($.isEmptyObject(object)){
+
+                //     var html_text_for_error = "No exact match found--Verify that the given address is correct";
+                //     console.log(html_text_for_error);
+                    
+                // }else{
+                var useCode = object.result.useCode;
+                //console.log(object.result.useCode);
+                var yearBuilt = object.result.yearBuilt;
+                var lotSizeSqFt = object.result.lotSizeSqFt;
+                var finishedSqFt = object.result.finishedSqFt;
+                var bathrooms = object.result.bathrooms;
+                var bedrooms = object.result.bedrooms;
+                var taxAssessmentYear = object.result.taxAssessmentYear;
+                var taxAssessment = object.result.taxAssessment;
+                var lastSoldPrice = object.result.lastSoldPrice;
+                var lastSoldDate = object.result.lastSoldDate;
+                var lastupdated_zestimate = object.result.estimateLastUpdate;
+                var estimateAmount = object.result.estimateAmount;
+                //var zestimate_amount = object.result.zestimate_amount;
+                //var all_time_property_range = object.all_time_property_range;
+                //var all_time_rent_range = object.all_time_rent_range;
+
+                var lastupdated_rentzestimate = object.result.restimateLastUpdate;
+                var lastupdated_amount_rentzestimate2 = object.result.restimateAmount;
+
+
+                var restimateValuationRangeLow = object.result.restimateValuationRangeLow;
+                var restimateValuationRangeHigh = object.result.restimateValuationRangeHigh;
+
+                var valueChange_zestimate = object.result.estimateValueChange;
+                var valueChange_rentzestimate2 = object.result.restimateValueChange;
+                var valueChange_rentzestimate2_downarrow = object.result.valueChange_rentzestimate2_downarrow;
+                var valueChange_rentzestimate2_uparrow = object.result.valueChange_rentzestimate2_uparrow;
+                var result_url = object.result.homedetails;
+                //var address = object.address;
+                var street1 = object.result.street;
+                var city1 = object.result.city;
+                var state1 = object.result.state;
+                var zipcode = object.result.zipcode;
+                var address = street1+" ,"+city1+" ,"+state1+"-"+zipcode;
+                var url1 = object.chart.year1;
+                var url2 = object.chart.years5;
+                var url3 = object.chart.years10;
+                var estimateValueChangeSign = object.result.estimateValueChangeSign;
+                var imgn = object.result.imgn;
+                var imgp = object.result.imgp;
+                var estimateValuationRangeHigh = object.result.estimateValuationRangeHigh;
+                var estimateValuationRangeLow = object.result.estimateValuationRangeLow;
+                var restimateValueChangeSign = object.result.restimateValueChangeSign;
+
+                console.log(useCode);
+                console.log(yearBuilt);
+                console.log(lotSizeSqFt);
+                console.log(finishedSqFt);
+                console.log(bathrooms);
+                console.log(bedrooms);
+                console.log(taxAssessmentYear);
+                console.log(taxAssessment);
+                console.log(lastSoldPrice);
+                console.log(lastSoldDate);
+                console.log(lastupdated_zestimate);
+                //console.log(zestimate_amount);
+                //console.log(all_time_property_range);
+                //console.log(all_time_rent_range);
+                console.log(lastupdated_rentzestimate);
+                console.log(lastupdated_amount_rentzestimate2);
+                console.log(valueChange_zestimate);
+                console.log(valueChange_rentzestimate2);
+                //console.log(valueChange_rentzestimate2_downarrow);
+                //console.log(valueChange_rentzestimate2_uparrow);
+                console.log(result_url);
+                console.log(address);
+                console.log(url1);
+                console.log(url2);
+                console.log(url3);
+                console.log(estimateAmount);
+                console.log(imgp);
+                console.log(imgn);
+                console.log(estimateValuationRangeHigh);
+                console.log(estimateValuationRangeLow);
+                console.log(restimateValuationRangeLow);
+                console.log(restimateValuationRangeHigh);
+
+                if(estimateValueChangeSign == "+")
+                {
+                  var estimate_image = imgp;
+                }else if(estimateValueChangeSign == "-"){
+                  var estimate_image = imgn;
+                }
+
+                if(estimateValuationRangeHigh == " "  || estimateValuationRangeLow == ""){
+                var all_time_property_range = "-";
+                }
+                else
+                {
+                var all_time_property_range = "$"+estimateValuationRangeHigh+" - "+"$"+estimateValuationRangeLow;
+                }
+
+                if(restimateValueChangeSign == "+"){
+                  var zestimate_image = imgp;
+                }else if(restimateValueChangeSign == "-"){
+                  var zestimate_image = imgn;
+                }
+
+                if(restimateValuationRangeLow == "" || restimateValuationRangeHigh ==""){
+                 var all_time_rent_range = "-"; 
+                }else{
+                 var all_time_rent_range = "$"+restimateValuationRangeHigh+" - "+"$"+restimateValuationRangeLow;
+                }
+ 
+                name = address;
+                description="Last Sold Price:"+lastSoldPrice+", 30 Days Overall Change: "+estimateValueChangeSign+" "+object.result.estimateValueChange;
+                link=result_url;
+                picture=url1;
+            
+var html_text1 = "<div id='inner1'><ul class='nav nav-tabs' role='tablist' id='myTab'><li class='active'><a href='#basicinfo' role='tab' data-toggle='tab' style='color: black; font-family: Arial; font-size: 4;'>Basic Info</a></li><li><a href='#chart' role='tab' data-toggle='tab'>Historical Zestimates</a></li></ul>";   
+
+var html_text2 = "<div class='tab-content'><div class='tab-pane fade in active table-responsive' role='tabpanel' style='background-color:white;' id='basicinfo'><table class='table table-striped table-responsive' style='background-color:white;overflow-y:scroll;white-space:nowrap;'><tr><td id='address' colspan='3'>See more details for <a href='"+result_url+"' id='result_url'><b>"+address+"</b></a> on Zillow </td><td align='right'><button class='btn btn-primary' id='facebook_button' onclick='facebook_button()'>Share on <b>Facebook</b></button></td></tr>";
+
+ var html_text3 ="<tr><td>Property Type:</td><td align='right' id='useCode'>"+useCode+"</td><td>Last Sold Price:</td><td id='lastSoldPrice' align='right'>"+lastSoldPrice+"</td></tr><tr><td>Year Built:</td><td id='yearBuilt' align='right'>"+yearBuilt+"</td><td>Last Sold Date:</td><td id='lastSoldDate' align='right'>"+lastSoldDate+"</td></tr>";
+
+var html_text4 ="<tr><td>Lot Size:</td><td id='lotSizeSqFt' align='right'>"+lotSizeSqFt+"</td><td>Zestimate <sup>&#174;</sup> Property Estimate as of <span id='lastupdated_zestimate'>"+lastupdated_zestimate+"</span></td><td id='estimateAmount' align='right'>"+estimateAmount+"</td></tr><tr><td>Finished Area:</td><td id='finishedSqFt' align='right'>"+finishedSqFt+"</td><td>30 Days Overall Change</td><td  align='right'><img id='estimate_image' src='"+estimate_image+"' alt=''/>&nbsp;<span id='valueChange_zestimate'>"+valueChange_zestimate+"</span></td></tr><tr><td>Bathrooms:</td><td id='bathrooms' align='right'>"+bathrooms+"</td><td>All time Property Range:</td><td id='all_time_property_range' align='right'>"+all_time_property_range+"</td></tr><tr><td>Bedrooms:</td><td id='bedrooms'  align='right'>"+bedrooms+"</td><td>Rent Zestimate <sup>&#174;</sup> Valuation as of <span id='lastupdated_rentzestimate' align='right'>"+lastupdated_rentzestimate+"</span>:</td><td id='lastupdated_amount_rentzestimate2' align='right'>"+lastupdated_amount_rentzestimate2+"</td></tr><tr><td>Tax Assessment Year</td><td id='taxAssessmentYear' align='right'>"+taxAssessmentYear+"</td><td>30 Days Rent Change</td><td align='right'><img src='"+zestimate_image+"' id='zestimate_image' alt=''/><span id='valueChange_rentzestimate2' align='right'>"+valueChange_rentzestimate2+"</td></tr><tr><td>Tax Assessment:</td><td id='taxAssessment' align='right'>"+taxAssessment+"</td><td>All Time Rent Range:</td><td id='all_time_rent_range' align='right'>"+all_time_rent_range+"</td></tr></table></div>";
+
+var html_text5 = "<div role='tabpanel' class='tab-pane fade' id='chart'><div id='charts' class='carousel slide' data-ride='carousel'><ol class='carousel-indicators'><li data-target='#charts' data-slide-to='0' class='active pull-right'></li><li data-target='#charts' data-slide-to='1' class='pull-right'></li><li data-target='#charts' data-slide-to='2' class='pull-right'></li></ol><div class='carousel-inner'><div class='item active'><img class='img-responsive center-block' src='"+url1+"' id='url1' alt=''><div class='carousel-caption'><h4 style='float:left'>Historical Zestimates for the past 1 year </h4><br/><h5><span id='address' style='float:left'>"+address+"</span></h5></div></div><div class='item'><img src='"+url2+"' id='url2' alt='...' class='img-responsive center-block'><div class='carousel-caption'><h4 style='float:left'>Historical Zestimates for the past 5 years</h4><br/><h5><span id='address' style='float:left'>"+address+"</span></h5></div></div><div class='item'><img src='"+url3+"' id='url3' alt='...' class='img-responsive center-block'><div class='carousel-caption'><h4 style='float:left'>Historical Zestimates for the past 10 years</h4><br/><h5><span id='address' style='float:left'>"+address+"</span></h5></div></div></div><a class='left carousel-control' href='#charts' role='button' data-slide='prev'><span class='glyphicon glyphicon-chevron-left'></span></a><a class='right carousel-control' href='#charts' role='button' data-slide='next'><span class='glyphicon glyphicon-chevron-right'></span></a></div></div></div></div><br/>";
+      
+
+            $("#error_div").empty();
+            $("#inner").empty();
+            var html_text = html_text1+html_text2+html_text3+html_text4+html_text5;
+            $("#inner").append(html_text);
+         //}
+        },
+                error: function(e, exception){
+
+                var html_text_for_error = "No exact match found--Verify that the given address is correct";
+                $("#inner").empty();
+                $("#error_div").text(html_text_for_error);
+                //alert("HI");
+                //alert(e.responseText);
+            }
+
+            });
+            }
+
+    });
+});
+</script>
+</head>
+
+<body style="background-image: url(http://www.neovisual.cz/files/V0779-d9.jpg);margin-left:5%;margin-top:2%;margin-right:4%">
+  
+<div class="container"> 
+    <div class="row">
+      <h4 style="color: #F1AC49;">Search Your Property Here</h4>
+    </div>
+
+    <div class="row">
+     <form class="form-horizontal basicform" role="form" id="form">
+      <div class="form-group" style="color: #F1AC49;">
+
+       <div class="col-lg-2">
+        <label for="address" style="color: #F1AC49;" class="control-label">Street Address*:</label>
+       </div> 
+       
+       <div class="col-lg-2">
+        <input type="text" class="form-control" id="address" name="address"  placeholder="Address">
+       </div>
+
+       <div class="col-lg-1">
+         <label for="city" style="color: #F1AC49;">City*:</label>
+       </div>
+         
+       <div class="col-lg-2">  
+        <input type="text" class="form-control" id="city" name="city"  placeholder="City">
+       </div>
+        
+       <div class="col-lg-1">
+        <label for="state" style="color: #F1AC49;">State*:</label>
+       </div>
+       
+       <div class="col-lg-1">
+        <select class="form-control" id="state" name="state">
+                            <option value="AL">AL</option>
+                            <option value="AK">AK</option>
+                            <option value="AZ">AZ</option>
+                            <option value="AR">AR</option>
+                            <option value="CA">CA</option>
+                            <option value="CO">CO</option>
+                            <option value="CT">CT</option>
+                            <option value="DE">DE</option>
+                            <option value="DC">DC</option>
+                            <option value="FL">FL</option>
+                            <option value="GA">GA</option>
+                            <option value="HI">HI</option>
+                            <option value="ID">ID</option>
+                            <option value="IL">IL</option>
+                            <option value="IN">IN</option>
+                            <option value="IA">IA</option>
+                            <option value="KS">KS</option>
+                            <option value="KY">KY</option>
+                            <option value="LA">LA</option>
+                            <option value="ME">ME</option>
+                            <option value="MD">MD</option>
+                            <option value="MA">MA</option>
+                            <option value="MI">MI</option>
+                            <option value="MN">MN</option>
+                            <option value="MS">MS</option>
+                            <option value="MO">MO</option>
+                            <option value="MT">MT</option>
+                            <option value="NE">NE</option>
+                            <option value="NV">NV</option>
+                            <option value="NH">NH</option>
+                            <option value="NJ">NJ</option>
+                            <option value="NM">NM</option>
+                            <option value="NY">NY</option>
+                            <option value="NC">NC</option>
+                            <option value="ND">ND</option>
+                            <option value="OH">OH</option>
+                            <option value="OK">OK</option>
+                            <option value="OR">OR</option>
+                            <option value="PA">PA</option>
+                            <option value="RI">RI</option>
+                            <option value="SC">SC</option>
+                            <option value="SD">SD</option>
+                            <option value="TN">TN</option>
+                            <option value="TX">TX</option>
+                            <option value="UT">UT</option>
+                            <option value="VT">VT</option>
+                            <option value="VA">VA</option>
+                            <option value="WA">WA</option>
+                            <option value="WV">WV</option>
+                            <option value="WI">WI</option>
+                            <option value="WY">WY</option>
+         </select>
+       </div>
+      <div class="col-lg-1" style="line-height:3.4em">
+        <button type="submit" class="btn btn-default" id="submit" style="color: white; font-family: Arial; font-size: 4;display: block;
+         background: #F1AC49;">Submit</button>
+      </div>
+      <div class="col-lg-2">
+        <a href="http://www.zillow.com/"><img class="pull-right img-responsive" src="http://www.zillowstatic.com/vstatic/33a276c/static/logos/Zillowlogo_150x40_rounded.gif" width="150" height="45" alt="Zillow Real Estate Search"/></a>
+     </div>
+   </form>
+ </div>
+</div>
+
+<br>
+<hr style="color:white;"/>
+
+
+<div id="error_div1" align="center" style="color:red;"><h4 id="error_div"></h4></div>
+<div class="container" id="inner"></div>
+<div id="last" style="color: #F1AC49; padding: 0px 5px 4px 25px; font-family: Arial; font-size: 4;">
+<br></br><center>&#169; Zillow, Inc., 2006-2014. Use is subject to <a href = http://www.zillow.com/corp/Terms.htm target=\"_blank\">Terms of use </a><br/><a href = http://www.zillow.com/zestimate/ target=\"_blank\">What's a Zestimate?</a></center>
+</div>
+<NOSCRIPT>
+</body>
+</html>
